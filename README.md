@@ -9,4 +9,4 @@
 >``logicGate (int type, bool pinA=true, ...)`` 类型，初始值\
 >``getOutput ()`` 获取输出值\
 >``setInput (int pin, bool value)`` 输入值\
->``setInput (int pin, logicGate *frombool, bool isOpposite=false)`` 连接到其他原件的输出
+>``setInput (int pin, logicGate *frombool, bool isOpposite=false)`` 连接到其他元件的输出
