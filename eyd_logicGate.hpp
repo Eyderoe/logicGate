@@ -179,46 +179,26 @@ int logicGate::addOutput (logicGate *to)
 int truthTable (logicGate **input, int inputNum, logicGate *output)
 {
     int caseNum = 1, caseNum_copy, base;  // 排列组合方式，最大表示的数为case-1，base每次输入端表示的数
-    for (
-        int i = 0 ;
-        i < inputNum ;
-        ++i) {
+    for (int i = 0 ; i < inputNum ; ++i) {
         caseNum *= 2;
     }
     caseNum_copy = caseNum;
     bool *inputList;
     inputList = new bool[inputNum];
 
-    for (
-        int i = 0 ;
-        i < caseNum ;
-        ++i) {
+    for (int i = 0 ; i < caseNum ; ++i) {
         caseNum_copy = i;   // 输入端表示的值
-        for (
-            int j = 0 ;
-            j < inputNum ;
-            ++j) {  // 求二进制
-            inputList[inputNum - 1 - j] =
-                bool(caseNum_copy
-                         &1);
+        for (int j = 0 ; j < inputNum ; ++j) {  // 求二进制
+            inputList[inputNum - 1 - j] = bool(caseNum_copy&1);
             caseNum_copy >>= 1;
         }
-        for (
-            int j = 0 ;
-            j < inputNum ;
-            ++j) {
+        for (int j = 0 ; j < inputNum ; ++j) {
             std::cout << inputList[j];
         }
         std::cout << " | ";
-        for (
-            int j = 0 ;
-            j < inputNum ;
-            ++j)    // 设置值
+        for (int j = 0 ; j < inputNum ; ++j)    // 设置值
             (*(input + j))->setInput(1, inputList[j]);
-        std::cout << output->
-            getOutput()
-                  <<
-                  std::endl;
+        std::cout << output->getOutput() << std::endl;
     }
     return 0;
 }
