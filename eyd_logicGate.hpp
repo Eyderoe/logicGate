@@ -24,6 +24,7 @@ class logicGate
         logicGate (int type, bool pinA, bool pinB, bool pinC, bool pinD);
         bool getOutput () const;
         int setInput (int pin, bool value);
+        int setInput (int pin, logicGate *from, bool isOpposite);
         int setInput (int pin, logicGate *from, bool isOpposite, int pin_2, logicGate *from_2, bool isOpposite_2);
 };
 logicGate::logicGate (int type, bool pinA = true, bool pinB = true, bool pinC = true, bool pinD = true)
@@ -121,8 +122,7 @@ int logicGate::setInput (int pin, bool value)
     fresh();
     return 0;
 }
-int logicGate::setInput (int pin, logicGate *from, bool isOpposite = false, \
-                        int pin_2 = -1, logicGate *from_2 = nullptr, bool isOpposite_2 = false)
+int logicGate::setInput (int pin, logicGate *from, bool isOpposite = false)
 {
     inputValue[pin - 1] = !isOpposite ? from->output : -(from->output);
     inputOpposite[pin - 1] = isOpposite;
@@ -133,23 +133,34 @@ int logicGate::setInput (int pin, logicGate *from, bool isOpposite = false, \
     inputClass[pin - 1] = from;
     from->addOutput(this);
     fresh();
-    if (pin_2 != -1) {
-        inputValue[pin_2 - 1] = !isOpposite_2 ? from_2->output : -(from_2->output);
-        inputOpposite[pin_2 - 1] = isOpposite_2;
-        if (inputClass[pin_2 - 1] != nullptr) {
-            inputClass[pin_2 - 1]->disconnect(this);
-            inputClass[pin_2 - 1] = nullptr;
-        }
-        inputClass[pin_2 - 1] = from_2;
-        from_2->addOutput(this);
-        fresh();
-        return 0;
-    }
     return 0;
+}
+int logicGate::setInput (int pin, logicGate *from, bool isOpposite, int pin_2, logicGate *from_2, bool isOpposite_2)
+{
+    inputValue[pin - 1] = !isOpposite ? from->output : -(from->output);
+    inputOpposite[pin - 1] = isOpposite;
+    if (inputClass[pin - 1] != nullptr) {
+        inputClass[pin - 1]->disconnect(this);
+        inputClass[pin - 1] = nullptr;
+    }
+    inputClass[pin - 1] = from;
+    from->addOutput(this);
+
+    inputValue[pin_2 - 1] = !isOpposite_2 ? from_2->output : -(from_2->output);
+    inputOpposite[pin_2 - 1] = isOpposite_2;
+    if (inputClass[pin_2 - 1] != nullptr) {
+        inputClass[pin_2 - 1]->disconnect(this);
+        inputClass[pin_2 - 1] = nullptr;
+    }
+    inputClass[pin_2 - 1] = from_2;
+    from_2->addOutput(this);
+    fresh();
+    return 0;
+
 }
 int logicGate::addOutput (logicGate *to)
 {
-    logicGate * *newList = nullptr;
+    logicGate **newList = nullptr;
     if (to->outputNum == to->outputMax) {
         newList = new logicGate *[outputMax + 2];
         for (int i = 0 ; i < outputNum ; ++i) {
@@ -165,53 +176,51 @@ int logicGate::addOutput (logicGate *to)
     return 0;
 }
 
-int truthTable(logicGate * *input, int
-inputNum,
-logicGate *output
-) {
-int caseNum = 1, caseNum_copy, base;  // 排列组合方式，最大表示的数为case-1，base每次输入端表示的数
-for (
-int i = 0;
-i<inputNum;
-++i) {
-caseNum *= 2;
-}
-caseNum_copy = caseNum;
-bool *inputList;
-inputList = new bool[inputNum];
+int truthTable (logicGate **input, int inputNum, logicGate *output)
+{
+    int caseNum = 1, caseNum_copy, base;  // 排列组合方式，最大表示的数为case-1，base每次输入端表示的数
+    for (
+        int i = 0 ;
+        i < inputNum ;
+        ++i) {
+        caseNum *= 2;
+    }
+    caseNum_copy = caseNum;
+    bool *inputList;
+    inputList = new bool[inputNum];
 
-for (
-int i = 0;
-i<caseNum;
-++i) {
-caseNum_copy = i;   // 输入端表示的值
-for (
-int j = 0;
-j<inputNum;
-++j) {  // 求二进制
-inputList[inputNum - 1 - j] =
-bool(caseNum_copy
-&1);
-caseNum_copy >>= 1;
-}
-for (
-int j = 0;
-j<inputNum;
-++j) {
-std::cout << inputList[j];
-}
-std::cout << " | ";
-for (
-int j = 0;
-j<inputNum;
-++j)    // 设置值
-(*(input + j))->setInput(1, inputList[j]);
-std::cout << output->
-getOutput ()
-<<
-std::endl;
-}
-return 0;
+    for (
+        int i = 0 ;
+        i < caseNum ;
+        ++i) {
+        caseNum_copy = i;   // 输入端表示的值
+        for (
+            int j = 0 ;
+            j < inputNum ;
+            ++j) {  // 求二进制
+            inputList[inputNum - 1 - j] =
+                bool(caseNum_copy
+                         &1);
+            caseNum_copy >>= 1;
+        }
+        for (
+            int j = 0 ;
+            j < inputNum ;
+            ++j) {
+            std::cout << inputList[j];
+        }
+        std::cout << " | ";
+        for (
+            int j = 0 ;
+            j < inputNum ;
+            ++j)    // 设置值
+            (*(input + j))->setInput(1, inputList[j]);
+        std::cout << output->
+            getOutput()
+                  <<
+                  std::endl;
+    }
+    return 0;
 }
 
 }
