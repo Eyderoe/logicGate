@@ -10,4 +10,5 @@
 >``getOutput ()`` 获取输出值\
 >``setInput (int pin, bool value)`` 输入值\
 >``setInput (int pin, logicGate *frombool, bool isOpposite=false)`` 连接到其他元件的输出\
+>``setInput (const int *pinList, logicGate **fromList, const bool *isOppositeList, int num)`` 数组初始化\
 >``setInput (int pin, logicGate *from, bool isOpposite, int pin_2, logicGate *from_2, bool isOpposite_2)`` 同时设置两个
