@@ -176,8 +176,9 @@ int logicGate::addOutput (logicGate *to)
     return 0;
 }
 
-int truthTable (logicGate **input, int inputNum, logicGate *output)
+int truthTable (logicGate **input, int inputNum, logicGate **output, int outputNum)
 {
+    // 只更改1号端口
     int caseNum = 1, caseNum_copy, base;  // 排列组合方式，最大表示的数为case-1，base每次输入端表示的数
     for (int i = 0 ; i < inputNum ; ++i) {
         caseNum *= 2;
@@ -198,7 +199,10 @@ int truthTable (logicGate **input, int inputNum, logicGate *output)
         std::cout << " | ";
         for (int j = 0 ; j < inputNum ; ++j)    // 设置值
             (*(input + j))->setInput(1, inputList[j]);
-        std::cout << output->getOutput() << std::endl;
+        for (int j = 0 ; j < outputNum ; ++j) {
+            std::cout << (*(output + j))->getOutput();
+        }
+        std::cout << std::endl;
     }
     return 0;
 }
