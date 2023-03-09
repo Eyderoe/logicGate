@@ -25,6 +25,7 @@ class logicGate
         bool getOutput () const;
         int setInput (int pin, bool value);
         int setInput (int pin, logicGate *from, bool isOpposite);
+        int setInput (const int *pinList, logicGate **fromList, const bool *isOppositeList, int num);
         int setInput (int pin, logicGate *from, bool isOpposite, int pin_2, logicGate *from_2, bool isOpposite_2);
 };
 logicGate::logicGate (int type, bool pinA = true, bool pinB = true, bool pinC = true, bool pinD = true)
@@ -132,6 +133,25 @@ int logicGate::setInput (int pin, logicGate *from, bool isOpposite = false)
     }
     inputClass[pin - 1] = from;
     from->addOutput(this);
+    fresh();
+    return 0;
+}
+int logicGate::setInput (const int *pinList, logicGate **fromList, const bool *isOppositeList, int num)
+{
+    for (int i = 0 ; i < num ; ++i) {
+        int tempP = pinList[i] - 1;
+        logicGate *tempLG = *(fromList + i);
+        bool tempB = isOppositeList[i];
+
+        inputValue[tempP] = !(tempB) ? tempLG->output : -(tempLG->output);
+        inputOpposite[tempP] = tempB;
+        if (inputClass[tempP] != nullptr) {
+            inputClass[tempP]->disconnect(this);
+            inputClass[tempP] = nullptr;
+        }
+        inputClass[tempP] = tempLG;
+        tempLG->addOutput(this);
+    }
     fresh();
     return 0;
 }
